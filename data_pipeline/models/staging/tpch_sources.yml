@@ -1,0 +1,23 @@
+version: 2  # Required for dbt YAML files
+
+sources:
+  - name: tpch  # Source name (you'll reference this in dbt using source('tpch', 'orders'))
+
+    database: snowflake_sample_data  # The Snowflake database where the source lives
+    schema: tpch_sf1                 # The schema within the database
+
+    tables:
+      - name: orders  # A source table
+        columns:
+          - name: o_orderkey
+            tests:
+              - unique      # Test: this column must have unique values
+              - not_null    # Test: this column must not have any nulls
+
+      - name: lineitem  # Another source table
+        columns:
+          - name: l_orderkey
+            tests:
+              - relationships:
+                  to: source('tpch', 'orders')  # Reference to the orders table
+                  field: o_orderkey             # Foreign key relationship test
